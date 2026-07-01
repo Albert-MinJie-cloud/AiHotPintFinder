@@ -1,22 +1,46 @@
 import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+  CartesianGrid, Legend, Line, LineChart,
+  ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { MOCK_TREND_DATA } from '../mockData';
+import type { ChartDataPoint } from '../types';
 
-export function TrendChart() {
+const LINE_COLORS = ['#4F46E5', '#F43F5E', '#10B981', '#F59E0B', '#8B5CF6'];
+
+interface Props {
+  data: ChartDataPoint[] | null;
+  keywords: string[];
+  loading?: boolean;
+}
+
+export function TrendChart({ data, keywords, loading }: Props) {
+  const colors = keywords.map((_, i) => LINE_COLORS[i % LINE_COLORS.length]);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 h-full flex flex-col">
+        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">头部热点热度趋势</h2>
+        <div className="flex-1 min-h-[300px] bg-slate-100 animate-pulse rounded-xl" />
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 h-full flex flex-col">
+        <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">头部热点热度趋势</h2>
+        <div className="flex-1 min-h-[300px] flex items-center justify-center text-slate-400">
+          暂无趋势数据
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 h-full flex flex-col">
       <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">头部热点热度趋势</h2>
       <div className="flex-1 min-h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={MOCK_TREND_DATA} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
             <XAxis
               dataKey="time"
@@ -31,50 +55,33 @@ export function TrendChart() {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `${value / 1000}k`}
               dx={-10}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: '#ffffff',
                 borderColor: '#e2e8f0',
-                color: '#0f172a',
-                borderRadius: '8px',
-                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-                fontWeight: 'bold',
+                borderRadius: '12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                fontSize: '13px',
               }}
-              itemStyle={{ fontSize: '13px' }}
-              labelStyle={{ color: '#64748b', marginBottom: '4px' }}
             />
             <Legend
-              wrapperStyle={{ fontSize: '13px', paddingTop: '10px', fontWeight: 'bold', color: '#475569' }}
-              iconType="circle"
-              iconSize={8}
+              verticalAlign="top"
+              align="right"
+              wrapperStyle={{ fontSize: '12px', fontWeight: 600 }}
             />
-            <Line
-              type="monotone"
-              dataKey="固态电池"
-              stroke="#f43f5e"
-              strokeWidth={3}
-              dot={{ r: 4, fill: '#f43f5e', strokeWidth: 0 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="新能源补贴"
-              stroke="#4f46e5"
-              strokeWidth={3}
-              dot={{ r: 4, fill: '#4f46e5', strokeWidth: 0 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="AI大模型"
-              stroke="#10b981"
-              strokeWidth={3}
-              dot={{ r: 4, fill: '#10b981', strokeWidth: 0 }}
-              activeDot={{ r: 6 }}
-            />
+            {keywords.map((kw, idx) => (
+              <Line
+                key={kw}
+                type="monotone"
+                dataKey={kw}
+                stroke={colors[idx]}
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 5, strokeWidth: 0 }}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>

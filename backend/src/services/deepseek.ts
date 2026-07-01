@@ -80,7 +80,7 @@ Content: ${content.substring(0, 1500)}`;
 export async function analyzeHotSpots(
   keyword: string,
   items: Array<{ title: string; content: string; source?: string }>
-): Promise<Array<{ title: string; summary: string; hotScore: number; isAuthentic: boolean }>> {
+): Promise<Array<{ title: string; summary: string; hotScore: number; isAuthentic: boolean; category: string }>> {
   if (items.length === 0) return [];
   const itemsText = items
     .map((item, i) => `${i + 1}. Title: ${item.title}\n   Content: ${item.content.substring(0, 500)}`)
@@ -92,7 +92,8 @@ export async function analyzeHotSpots(
     "title": "<concise title>",
     "summary": "<1-2 sentence summary>",
     "hotScore": <0-100>,
-    "isAuthentic": true/false
+    "isAuthentic": true/false,
+    "category": "<科技|娱乐|财经|民生|文化|游戏|社会|国际|房产|其他>"
   }
 ]
 
@@ -112,6 +113,7 @@ ${itemsText}`;
         summary: item.summary || '',
         hotScore: typeof item.hotScore === 'number' ? item.hotScore : 0,
         isAuthentic: Boolean(item.isAuthentic),
+        category: item.category || '',
       }));
     }
     return [];

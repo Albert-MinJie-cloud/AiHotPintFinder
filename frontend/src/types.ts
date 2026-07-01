@@ -1,16 +1,20 @@
-export type TrendStatus = 'up' | 'down' | 'new' | 'stable';
+export type TrendStatus = "up" | "down" | "new" | "stable";
 
 export interface HotspotItem {
   id: string;
   rank: number;
   title: string;
   summary?: string;
-  relevance?: number;
+  authenticity_score?: number;
   heatScore: number;
   trend: TrendStatus;
   category: string;
   source: string;
   timestamp: string;
+  platform?: string;
+  url?: string;
+  isAuthentic?: boolean;
+  keyword?: string;
 }
 
 export interface ChartDataPoint {
