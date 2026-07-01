@@ -8,6 +8,7 @@ Monorepo with two independent projects:
 - `frontend/` — React 19 + Vite 6 + TypeScript + Tailwind CSS v4 SPA
 
 Backend source (`backend/src/`):
+
 - `index.ts` — Express entrypoint, middleware, route mounting
 - `db.ts` — SQLite schema (keywords, hot_spots, notifications, historical_volume, config)
 - `swagger.ts` — OpenAPI 3.0 spec generation via swagger-jsdoc
@@ -17,6 +18,7 @@ Backend source (`backend/src/`):
 - `socket.ts` — Socket.IO for real-time push notifications
 
 Frontend source (`frontend/src/`):
+
 - `main.tsx` / `App.tsx` — Entry with useState-based view routing
 - `components/` — `Header.tsx`, `Sidebar.tsx`, `KpiCards.tsx`, `TrendChart.tsx`, `CategoryChart.tsx`, `HotspotTable.tsx`, `KeywordManager.tsx`, `NotificationSettings.tsx`
 - `mockData.ts` — Hardcoded demo data
@@ -29,13 +31,13 @@ cd backend && npm run dev   # port 3001
 cd frontend && npm run dev  # port 5199, standalone
 ```
 
-| Command | Where | Purpose |
-|---|---|---|
-| `npm run dev` | `backend/` | Hot-reload via `tsx watch` |
-| `npm run build` | `backend/` | Compile TypeScript to `dist/` |
-| `npm run dev` | `frontend/` | Vite dev server on port 5199 |
+| Command         | Where       | Purpose                       |
+| --------------- | ----------- | ----------------------------- |
+| `npm run dev`   | `backend/`  | Hot-reload via `tsx watch`    |
+| `npm run build` | `backend/`  | Compile TypeScript to `dist/` |
+| `npm run dev`   | `frontend/` | Vite dev server on port 5199  |
 | `npm run build` | `frontend/` | Type-check + production build |
-| `npm run lint` | `frontend/` | `tsc --noEmit` type check |
+| `npm run lint`  | `frontend/` | `tsc --noEmit` type check     |
 
 ## API Documentation
 
@@ -98,7 +100,7 @@ Register in `sources/collector.ts`:
 const SOURCES: SourceAdapter[] = [
   webSearchAdapter,
   twitterAdapter,
-  newSourceAdapter,  // ← add here
+  newSourceAdapter, // ← add here
 ];
 ```
 
@@ -114,21 +116,6 @@ Schema changes use idempotent `migrateAddColumn()` in `db.ts`. New columns are a
 
 ## Design System
 
-Light-themed B-end dashboard with indigo brand color.
-
-| Token | Hex | Usage |
-|---|---|---|
-| `indigo-600` | `#4F46E5` | Header bg, primary buttons, active nav |
-| `indigo-50` | `#EEF2FF` | Active nav bg |
-| `rose-500` | `#F43F5E` | Heat indicator, negative trend |
-| `emerald-500` | `#10B981` | Positive trend, sentiment |
-| `amber-500` | `#F59E0B` | KPI cards, "new" label |
-| `yellow-400` | `#FACC15` | Brand logo, hover state |
-
-**Neutrals**: `slate-50` page bg, `white` cards/sidebar, `slate-200` borders, `slate-400/500` muted text.
-
-**Typography**: System sans-serif stack for CJK body text.
-
 ## Coding Style
 
 - TypeScript strict mode
@@ -139,10 +126,10 @@ Light-themed B-end dashboard with indigo brand color.
 
 ## Rate Limiting & Anti-Blocking
 
-| Source | Strategy |
-|---|---|
+| Source                               | Strategy                                                             |
+| ------------------------------------ | -------------------------------------------------------------------- |
 | Web Search (`sources/web-search.ts`) | ≥3s between requests, random UA rotation, DuckDuckGo → Bing fallback |
-| Twitter API (`sources/twitter.ts`) | ≥2s between requests, handles 401/403/429 gracefully |
+| Twitter API (`sources/twitter.ts`)   | ≥2s between requests, handles 401/403/429 gracefully                 |
 
 All source failures are isolated via `Promise.allSettled`.
 
@@ -152,14 +139,14 @@ All source failures are isolated via `Promise.allSettled`.
 cp backend/.env.example backend/.env
 ```
 
-| Variable | Default | Description |
-|---|---|---|
-| `DEEPSEEK_API_KEY` | — | DeepSeek AI key (required) |
-| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com` | API endpoint |
-| `PORT` | `3001` | Backend server port |
-| `FRONTEND_URL` | `http://localhost:5173` | CORS origin |
-| `TWITTER_API_KEY` | — | twitterapi.io key (optional) |
-| `TWITTER_API_BASE` | `https://twitterapi.io/api` | API endpoint |
+| Variable            | Default                     | Description                  |
+| ------------------- | --------------------------- | ---------------------------- |
+| `DEEPSEEK_API_KEY`  | —                           | DeepSeek AI key (required)   |
+| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com`  | API endpoint                 |
+| `PORT`              | `3001`                      | Backend server port          |
+| `FRONTEND_URL`      | `http://localhost:5173`     | CORS origin                  |
+| `TWITTER_API_KEY`   | —                           | twitterapi.io key (optional) |
+| `TWITTER_API_BASE`  | `https://twitterapi.io/api` | API endpoint                 |
 
 ## Database
 
@@ -167,12 +154,12 @@ SQLite (WAL mode): `keywords`, `hot_spots` (with category/platform/trend/sentime
 
 **Foreign key enforcement**: `better-sqlite3` v11.x enables `PRAGMA foreign_keys = ON` by default. This is explicitly set in `db.ts` for clarity. All child records must be deleted before their parent — always wrap multi-table mutations in `db.transaction()`. The FK relationships are:
 
-| Child Table | FK Column | Parent Table |
-|---|---|---|
-| `hot_spots` | `keyword_id` | `keywords(id)` |
-| `notifications` | `keyword_id` | `keywords(id)` |
-| `notifications` | `hot_spot_id` | `hot_spots(id)` |
-| `historical_volume` | `keyword_id` | `keywords(id)` |
+| Child Table         | FK Column     | Parent Table    |
+| ------------------- | ------------- | --------------- |
+| `hot_spots`         | `keyword_id`  | `keywords(id)`  |
+| `notifications`     | `keyword_id`  | `keywords(id)`  |
+| `notifications`     | `hot_spot_id` | `hot_spots(id)` |
+| `historical_volume` | `keyword_id`  | `keywords(id)`  |
 
 When deleting a keyword, also delete from: `notifications`, `hot_spots`, `historical_volume` — in that order within a transaction.
 
